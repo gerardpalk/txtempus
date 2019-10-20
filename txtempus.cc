@@ -38,8 +38,13 @@
 // The GPIO bit that is pulled down for attenuation of the signal.
 const uint32_t kAttenuationGPIOBit = (1<<17);
 
+// The GPIO bit for the LED indicator
+const uint32_t kLedGPIOBit = (1<<14);
+
 static bool verbose = false;
 static bool dryrun = false;
+static bool blink = false;
+static bool led = false;
 
 namespace {
 volatile sig_atomic_t interrupted = 0;
@@ -97,6 +102,17 @@ void PrintLocalTime(time_t t) {
   fprintf(stderr, "%s", buf);
 }
 
+void Blink(GPIO *gpio) {
+  if (!led) {
+    gpio->RequestInput(kLedGPIOBit);   // High-Z
+    led = true;
+  } else {
+    gpio->RequestOutput(kLedGPIOBit);  // Pull down.
+    gpio->ClearBits(kLedGPIOBit);    
+    led = false;
+  }
+}
+
 // Show a full modulation of one second as little ASCII-art.
 void PrintModulationChart(const TimeSignalSource::SecondModulation &mod) {
   static const int kMsPerDash = 100;
@@ -140,6 +156,7 @@ int usage(const char *msg, const char *progname) {
           "(default: now)\n"
           "\t-z <minutes>          : Transmit the time offset from local "
           "(default: 0 minutes)\n"
+          "\t-b                    : Blink led while on.\n"         
           "\t-v                    : Verbose.\n"
           "\t-n                    : Dryrun, only showing modulation "
           "envelope.\n"
@@ -174,6 +191,9 @@ int main(int argc, char *argv[]) {
       break;
     case 's':
       service = strdup(optarg);
+      break;
+    case 'b':
+      blink = true;
       break;
     case 'n':
       dryrun = true;
@@ -234,6 +254,7 @@ int main(int argc, char *argv[]) {
         WaitUntil(target_wait);
       }
       if (verbose) fprintf(stderr, "\b\b\b:%02d", second);
+      if (blink) Blink(&gpio);
       if (dryrun) PrintModulationChart(modulation);
     }
     if (verbose) fprintf(stderr, "\n");
