@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
   int zone_offset = 0;
   int ttl = INT_MAX;
   int opt;
-  while ((opt = getopt(argc, argv, "t:z:r:vs:hn")) != -1) {
+  while ((opt = getopt(argc, argv, "t:z:r:vbs:hn")) != -1) {
     switch (opt) {
     case 'v':
       verbose = true;
