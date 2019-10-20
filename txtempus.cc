@@ -104,7 +104,8 @@ void PrintLocalTime(time_t t) {
 
 void Blink(GPIO *gpio) {
   if (!led) {
-    gpio->RequestInput(kLedGPIOBit);   // High-Z
+    gpio->RequestOutput(kLedGPIOBit);   // High-Z
+    gpio->SetBits(kLedGPIOBit);
     led = true;
   } else {
     gpio->RequestOutput(kLedGPIOBit);  // Pull down.
