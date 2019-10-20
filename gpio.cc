@@ -111,7 +111,7 @@ double GPIO::StartClock(double requested_freq) {
   static const struct { int src; double frequency; } kClockSources[] = {
     { 5, 1000.0e6 },   // PLLC
     { 6,  500.0e6 },   // PLLD
-    { 7,  216.0e6 },   // HDMI
+    { 7,    5.8e6 },   // HDMI
     { 1,   19.2e6 },   // regular oscillator
   };
 
